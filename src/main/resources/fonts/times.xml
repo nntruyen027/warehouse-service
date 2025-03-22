@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fontFamilies>
+    <fontFamily name="Times">
+        <normal><![CDATA[fonts/times.ttf]]></normal>
+        <bold><![CDATA[fonts/timesbd.ttf]]></bold>
+        <italic><![CDATA[fonts/timesi.ttf]]></italic>
+        <boldItalic><![CDATA[fonts/timesbi.ttf]]></boldItalic>
+        <pdfEncoding>Identity-H</pdfEncoding>
+        <pdfEmbedded>true</pdfEmbedded>
+    </fontFamily>
+</fontFamilies>
