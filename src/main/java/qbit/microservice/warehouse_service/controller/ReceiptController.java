@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import qbit.microservice.warehouse_service.dto.StatisticsInputDto;
 import qbit.microservice.warehouse_service.entity.Receipt;
 import qbit.microservice.warehouse_service.service.ReceiptService;
 
@@ -53,6 +54,10 @@ public class ReceiptController {
                     .contentType(MediaType.APPLICATION_PDF)
                     .body(pdfBytes);
 
+    }
 
+    @GetMapping("/statistics")
+    public ResponseEntity<?> doStatistics(@RequestBody StatisticsInputDto input) throws Exception {
+        return ResponseEntity.ok(receiptService.getThongKeNhap(input.getIds(), input.getStartDate(), input.getEndDate()));
     }
 }

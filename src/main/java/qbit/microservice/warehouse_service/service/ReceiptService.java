@@ -5,9 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import qbit.microservice.warehouse_service.client.ProductServiceClient;
+import qbit.microservice.warehouse_service.dto.ThongKeDto;
 import qbit.microservice.warehouse_service.entity.Receipt;
 import qbit.microservice.warehouse_service.entity.Item;
 import qbit.microservice.warehouse_service.repository.ReceiptRepository;
@@ -15,9 +19,8 @@ import qbit.microservice.warehouse_service.dto.ProductVersionDto;
 import qbit.microservice.warehouse_service.util.JwtUtil;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class ReceiptService {
@@ -32,6 +35,9 @@ public class ReceiptService {
 
     @Autowired
     private ProductServiceClient productServiceClient;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     public Page<Receipt> getAllReceipts(Pageable pageable) {
         return receiptRepository.findAll(pageable);
@@ -120,4 +126,34 @@ public class ReceiptService {
 
         return jasperReportService.generateReport("receipt_report", parameters, new JREmptyDataSource(1));
     }
+
+    public List<ThongKeDto> getThongKeNhap(List<Long> itemIds, LocalDate startDate, LocalDate endDate) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("items.id").in(itemIds));
+
+        if (startDate != null && endDate != null) {
+            query.addCriteria(Criteria.where("ngayGiao")
+                    .gte(startDate.atStartOfDay())
+                    .lt(endDate.plusDays(1).atStartOfDay()));
+        }
+
+        List<Receipt> receipts = mongoTemplate.find(query, Receipt.class);
+
+        Map<Long, ThongKeDto> thongKeMap = new HashMap<>();
+
+        for (Receipt receipt : receipts) {
+            for (Item item : receipt.getItems()) {
+                if (itemIds.contains(item.getId())) {
+                    thongKeMap.putIfAbsent(item.getId(), new ThongKeDto(item.getId(), 0, BigDecimal.ZERO));
+
+                    ThongKeDto thongKeDto = thongKeMap.get(item.getId());
+                    thongKeDto.setSoLuong(thongKeDto.getSoLuong() + item.getQuantity());
+                    thongKeDto.setTongTien(thongKeDto.getTongTien().add(item.getItemTotal()));
+                }
+            }
+        }
+
+        return new ArrayList<>(thongKeMap.values());
+    }
+
 }
