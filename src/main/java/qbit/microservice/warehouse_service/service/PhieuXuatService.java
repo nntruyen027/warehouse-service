@@ -14,6 +14,7 @@ import qbit.microservice.warehouse_service.dto.ThongKeDto;
 import qbit.microservice.warehouse_service.entity.PhieuXuat;
 import qbit.microservice.warehouse_service.entity.Item;
 import qbit.microservice.warehouse_service.dto.ProductVersionDto;
+import qbit.microservice.warehouse_service.entity.Receipt;
 import qbit.microservice.warehouse_service.repository.PhieuXuatRepository;
 import qbit.microservice.warehouse_service.util.JwtUtil;
 
@@ -178,6 +179,86 @@ public class PhieuXuatService {
         }
 
         return new ArrayList<>(thongKeMap.values());
+    }
+
+    public Map<Integer, Map<Long, ThongKeDto>> getQuarterlyImportStatistics(int year) {
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("thoiGianTao").gte(startDate.atStartOfDay()).lt(endDate.plusDays(1).atStartOfDay()));
+
+        List<PhieuXuat> receipts = mongoTemplate.find(query, PhieuXuat.class);
+        return processQuarterlyStatistics(receipts);
+    }
+
+    public Map<Integer, Map<Long, ThongKeDto>> getMonthlyImportStatistics(int year) {
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("thoiGianTao").gte(startDate.atStartOfDay()).lt(endDate.plusDays(1).atStartOfDay()));
+
+        List<PhieuXuat> phieuXuats = mongoTemplate.find(query, PhieuXuat.class);
+        return processMonthlyStatistics(phieuXuats);
+    }
+
+    private Map<Integer, Map<Long, ThongKeDto>> processQuarterlyStatistics(List<PhieuXuat> phieuXuats) {
+        Map<Integer, Map<Long, ThongKeDto>> quarterlyStats = new HashMap<>();
+
+        for (int quarter = 1; quarter <= 4; quarter++) {
+            quarterlyStats.put(quarter, new HashMap<>());
+        }
+
+
+        for (PhieuXuat phieuXuat : phieuXuats) {
+            LocalDateTime thoiGianTao = phieuXuat.getThoiGianTao();
+            int quarter = (getQuarter(thoiGianTao.getMonthValue()));
+
+            for (Item item : phieuXuat.getItems()) {
+                Long itemId = item.getId();
+                quarterlyStats.putIfAbsent(quarter, new HashMap<>());
+                quarterlyStats.get(quarter).putIfAbsent(itemId, new ThongKeDto(itemId,0, BigDecimal.ZERO));
+
+                ThongKeDto stats = quarterlyStats.get(quarter).get(itemId);
+                stats.setSoLuong(stats.getSoLuong() + item.getQuantity());
+                stats.setTongTien(stats.getTongTien().add(item.getItemTotal()));
+            }
+        }
+
+        return quarterlyStats;
+    }
+
+    private Map<Integer, Map<Long, ThongKeDto>> processMonthlyStatistics(List<PhieuXuat> phieuXuats) {
+        Map<Integer, Map<Long, ThongKeDto>> result = new HashMap<>();
+
+        for (int month = 1; month <= 12; month++) {
+            result.put(month, new HashMap<>());
+        }
+
+        for (PhieuXuat phieuXuat : phieuXuats) {
+            Integer monthKey = phieuXuat.getThoiGianTao().getMonthValue();
+
+            for (Item item : phieuXuat.getItems()) {
+                result.computeIfAbsent(monthKey, k -> new HashMap<>())
+                        .compute(item.getId(), (id, stat) -> {
+                            if (stat == null) stat = new ThongKeDto(item.getId(), 0, BigDecimal.ZERO);
+                            stat.setSoLuong(stat.getSoLuong() + item.getQuantity());
+                            stat.setTongTien(stat.getTongTien().add(item.getItemTotal()));
+                            return stat;
+                        });
+            }
+        }
+
+        return result;
+    }
+
+
+    private int getQuarter(int month) {
+        if (month >= 1 && month <= 3) return 1;
+        if (month >= 4 && month <= 6) return 2;
+        if (month >= 7 && month <= 9) return 3;
+        return 4;
     }
 
 }

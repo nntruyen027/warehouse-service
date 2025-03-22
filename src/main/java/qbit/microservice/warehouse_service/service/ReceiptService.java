@@ -20,6 +20,7 @@ import qbit.microservice.warehouse_service.util.JwtUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -155,5 +156,85 @@ public class ReceiptService {
 
         return new ArrayList<>(thongKeMap.values());
     }
+
+
+    public Map<Integer, Map<Long, ThongKeDto>> getQuarterlyImportStatistics(int year) {
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("thoiGianTao").gte(startDate.atStartOfDay()).lt(endDate.plusDays(1).atStartOfDay()));
+
+        List<Receipt> receipts = mongoTemplate.find(query, Receipt.class);
+        return processQuarterlyStatistics(receipts);
+    }
+
+    public Map<Integer, Map<Long, ThongKeDto>> getMonthlyImportStatistics(int year) {
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("thoiGianTao").gte(startDate.atStartOfDay()).lt(endDate.plusDays(1).atStartOfDay()));
+
+        List<Receipt> receipts = mongoTemplate.find(query, Receipt.class);
+        return processMonthlyStatistics(receipts);
+    }
+
+    private Map<Integer, Map<Long, ThongKeDto>> processQuarterlyStatistics(List<Receipt> receipts) {
+        Map<Integer, Map<Long, ThongKeDto>> quarterlyStats = new HashMap<>();
+
+        for (int quarter = 1; quarter <= 4; quarter++) {
+            quarterlyStats.put(quarter, new HashMap<>());
+        }
+
+        for (Receipt receipt : receipts) {
+            LocalDateTime thoiGianTao = receipt.getThoiGianTao();
+            int quarter = (getQuarter(thoiGianTao.getMonthValue()));
+
+            for (Item item : receipt.getItems()) {
+                Long itemId = item.getId();
+                quarterlyStats.putIfAbsent(quarter, new HashMap<>());
+                quarterlyStats.get(quarter).putIfAbsent(itemId, new ThongKeDto(itemId,0, BigDecimal.ZERO));
+
+                ThongKeDto stats = quarterlyStats.get(quarter).get(itemId);
+                stats.setSoLuong(stats.getSoLuong() + item.getQuantity());
+                stats.setTongTien(stats.getTongTien().add(item.getItemTotal()));
+            }
+        }
+
+        return quarterlyStats;
+    }
+
+    private Map<Integer, Map<Long, ThongKeDto>> processMonthlyStatistics(List<Receipt> receipts) {
+        Map<Integer, Map<Long, ThongKeDto>> result = new HashMap<>();
+
+        for (int month = 1; month <= 12; month++) {
+            result.put(month, new HashMap<>());
+        }
+
+        for (Receipt receipt : receipts) {
+            Integer monthKey = receipt.getThoiGianTao().getMonthValue();
+
+            for (Item item : receipt.getItems()) {
+                result.computeIfAbsent(monthKey, k -> new HashMap<>())
+                        .compute(item.getId(), (id, stat) -> {
+                            if (stat == null) stat = new ThongKeDto(item.getId(), 0, BigDecimal.ZERO);
+                            stat.setSoLuong(stat.getSoLuong() + item.getQuantity());
+                            stat.setTongTien(stat.getTongTien().add(item.getItemTotal()));
+                            return stat;
+                        });
+            }
+        }
+
+        return result;
+    }
+
+    private int getQuarter(int month) {
+        if (month >= 1 && month <= 3) return 1;
+        if (month >= 4 && month <= 6) return 2;
+        if (month >= 7 && month <= 9) return 3;
+        return 4;
+    }
+
 
 }

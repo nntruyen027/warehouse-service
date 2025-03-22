@@ -26,5 +26,7 @@ public class PhieuXuat {
     private String sdtKh;
     private List<Item> items;
     private BigDecimal totalAmount;
-    private LocalDateTime thoiGianTao;
+
+    @Builder.Default
+    private LocalDateTime thoiGianTao = LocalDateTime.now();
 }

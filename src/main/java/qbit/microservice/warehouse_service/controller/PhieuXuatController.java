@@ -60,5 +60,15 @@ public class PhieuXuatController {
         return ResponseEntity.ok(phieuXuatService.getThongKe(input.getIds(), input.getStartDate(), input.getEndDate()));
     }
 
+    @GetMapping("/statistics/year/{nam}/quarters")
+    public ResponseEntity<?> doQuarterlyStatistics(@PathVariable int nam) throws Exception {
+        return ResponseEntity.ok(phieuXuatService.getQuarterlyImportStatistics(nam));
+    }
+
+    @GetMapping("/statistics/year/{nam}/months")
+    public ResponseEntity<?> doMonthlyStatistics(@PathVariable int nam) throws Exception {
+        return ResponseEntity.ok(phieuXuatService.getMonthlyImportStatistics(nam));
+    }
+
 
 }

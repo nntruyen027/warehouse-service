@@ -60,4 +60,14 @@ public class ReceiptController {
     public ResponseEntity<?> doStatistics(@RequestBody StatisticsInputDto input) throws Exception {
         return ResponseEntity.ok(receiptService.getThongKeNhap(input.getIds(), input.getStartDate(), input.getEndDate()));
     }
+
+    @GetMapping("/statistics/year/{nam}/quarters")
+    public ResponseEntity<?> doQuarterlyStatistics(@PathVariable int nam) throws Exception {
+        return ResponseEntity.ok(receiptService.getQuarterlyImportStatistics(nam));
+    }
+
+    @GetMapping("/statistics/year/{nam}/months")
+    public ResponseEntity<?> doMonthlyStatistics(@PathVariable int nam) throws Exception {
+        return ResponseEntity.ok(receiptService.getMonthlyImportStatistics(nam));
+    }
 }

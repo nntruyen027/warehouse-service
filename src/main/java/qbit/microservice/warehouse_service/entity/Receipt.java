@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "warehouse_receipts")
@@ -26,4 +27,7 @@ public class Receipt {
     private String khoDiaChi; // Địa chỉ kho
     private List<Item> items;
     private BigDecimal totalAmount;
+
+    @Builder.Default
+    private LocalDateTime thoiGianTao = LocalDateTime.now();
 }
