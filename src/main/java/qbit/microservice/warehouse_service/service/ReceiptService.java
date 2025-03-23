@@ -50,7 +50,6 @@ public class ReceiptService {
     }
 
     public Receipt createReceipt(Receipt receipt) {
-        // Tính toán itemTotal cho từng mặt hàng và cập nhật kho
         for (Item item : receipt.getItems()) {
             item.setItemTotal(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
             ResponseEntity<ProductVersionDto> response = productServiceClient.addItem(
@@ -119,6 +118,9 @@ public class ReceiptService {
         parameters.put("ngayGiao", receipt.getNgayGiao().toString());
         parameters.put("bbSoHieu", receipt.getBbSoHieu());
         parameters.put("bbNgay", receipt.getBbNgay().toString());
+        parameters.put("ngayTao", receipt.getThoiGianTao().getDayOfMonth());
+        parameters.put("thangTao", receipt.getThoiGianTao().getMonthValue());
+        parameters.put("namTao", receipt.getThoiGianTao().getYear());
         parameters.put("nhaCungCap", receipt.getNhaCungCap());
         parameters.put("khoTen", receipt.getKhoTen());
         parameters.put("khoDiaChi", receipt.getKhoDiaChi());

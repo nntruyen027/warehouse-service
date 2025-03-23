@@ -19,7 +19,7 @@ public class PhieuXuat {
     @Id
     private String id;
 
-    private String tenCuaHang;
+    private String sdtCuaHang;
     private String diaChiCuaHang;
     private String tenKh;
     private String diaChiKh;

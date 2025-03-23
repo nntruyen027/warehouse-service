@@ -84,7 +84,7 @@ public class PhieuXuatService {
         PhieuXuat existing = existingOpt.get();
 
         // Cập nhật các trường cơ bản
-        existing.setTenCuaHang(updatedPhieuXuat.getTenCuaHang());
+        existing.setSdtCuaHang(updatedPhieuXuat.getSdtCuaHang());
         existing.setDiaChiCuaHang(updatedPhieuXuat.getDiaChiCuaHang());
         existing.setTenKh(updatedPhieuXuat.getTenKh());
         existing.setDiaChiKh(updatedPhieuXuat.getDiaChiKh());
@@ -137,19 +137,21 @@ public class PhieuXuatService {
 
     public byte[] generatePhieuXuatReport(PhieuXuat phieuXuat) throws Exception {
         Map<String, Object> parameters = new HashMap<>();
-        // Các thông tin của phiếu xuất
-        parameters.put("tenCuaHang", phieuXuat.getTenCuaHang());
+
+        parameters.put("sdtCuaHang", phieuXuat.getSdtCuaHang());
         parameters.put("diaChiCuaHang", phieuXuat.getDiaChiCuaHang());
         parameters.put("tenKh", phieuXuat.getTenKh());
         parameters.put("diaChiKh", phieuXuat.getDiaChiKh());
         parameters.put("sdtKh", phieuXuat.getSdtKh());
-        parameters.put("thoiGianTao", phieuXuat.getThoiGianTao().toString());
+        parameters.put("ngayTao", phieuXuat.getThoiGianTao().getDayOfMonth());
+        parameters.put("thangTao", phieuXuat.getThoiGianTao().getMonthValue());
+        parameters.put("namTao", phieuXuat.getThoiGianTao().getYear());
         parameters.put("totalAmount", phieuXuat.getTotalAmount().toString());
-        // Đưa danh sách items vào parameter để table component sử dụng
+
         parameters.put("items", phieuXuat.getItems());
 
-        // Sử dụng JREmptyDataSource(1) để main report in đúng 1 lần
-        return jasperReportService.generateReport("phieu_xuat_report", parameters, new JREmptyDataSource(1));
+
+        return jasperReportService.generateReport("invoice_report", parameters, new JREmptyDataSource(1));
     }
 
     public List<ThongKeDto> getThongKe(List<Long> itemIds, LocalDate startDate, LocalDate endDate) {
