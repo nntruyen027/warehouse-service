@@ -13,8 +13,7 @@ public class FeignClientConfig {
         return requestTemplate -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (authentication != null && authentication.getCredentials() instanceof String) {
-                String jwt = (String) authentication.getCredentials();
+            if (authentication != null && authentication.getCredentials() instanceof String jwt) {
                 requestTemplate.header("Authorization", "Bearer " + jwt); // Thêm header Authorization
                 System.out.println("JWT sent to Auth Service: " + jwt);
             }

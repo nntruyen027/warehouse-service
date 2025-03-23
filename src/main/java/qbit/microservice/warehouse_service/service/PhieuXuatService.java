@@ -10,11 +10,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import qbit.microservice.warehouse_service.client.ProductServiceClient;
-import qbit.microservice.warehouse_service.dto.ThongKeDto;
-import qbit.microservice.warehouse_service.entity.PhieuXuat;
-import qbit.microservice.warehouse_service.entity.Item;
 import qbit.microservice.warehouse_service.dto.ProductVersionDto;
-import qbit.microservice.warehouse_service.entity.Receipt;
+import qbit.microservice.warehouse_service.dto.ThongKeDto;
+import qbit.microservice.warehouse_service.entity.Item;
+import qbit.microservice.warehouse_service.entity.PhieuXuat;
 import qbit.microservice.warehouse_service.repository.PhieuXuatRepository;
 import qbit.microservice.warehouse_service.util.JwtUtil;
 
@@ -70,7 +69,7 @@ public class PhieuXuatService {
         phieuXuat.setTotalAmount(totalAmount);
 
         // Thiết lập thời gian tạo nếu chưa có
-        if(phieuXuat.getThoiGianTao() == null) {
+        if (phieuXuat.getThoiGianTao() == null) {
             phieuXuat.setThoiGianTao(LocalDateTime.now());
         }
         return phieuXuatRepository.save(phieuXuat);
@@ -175,7 +174,7 @@ public class PhieuXuatService {
 
                     ThongKeDto thongKeDto = thongKeMap.get(item.getId());
                     thongKeDto.setSoLuong(thongKeDto.getSoLuong() + item.getQuantity());
-                    thongKeDto.setTongTien(thongKeDto.getTongTien().add(item.getItemTotal()) );
+                    thongKeDto.setTongTien(thongKeDto.getTongTien().add(item.getItemTotal()));
                 }
             }
         }
@@ -220,7 +219,7 @@ public class PhieuXuatService {
             for (Item item : phieuXuat.getItems()) {
                 Long itemId = item.getId();
                 quarterlyStats.putIfAbsent(quarter, new HashMap<>());
-                quarterlyStats.get(quarter).putIfAbsent(itemId, new ThongKeDto(itemId,0, BigDecimal.ZERO));
+                quarterlyStats.get(quarter).putIfAbsent(itemId, new ThongKeDto(itemId, 0, BigDecimal.ZERO));
 
                 ThongKeDto stats = quarterlyStats.get(quarter).get(itemId);
                 stats.setSoLuong(stats.getSoLuong() + item.getQuantity());

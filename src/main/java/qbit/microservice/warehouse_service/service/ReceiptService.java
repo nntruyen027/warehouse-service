@@ -2,7 +2,6 @@ package qbit.microservice.warehouse_service.service;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -11,11 +10,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import qbit.microservice.warehouse_service.client.ProductServiceClient;
-import qbit.microservice.warehouse_service.dto.ThongKeDto;
-import qbit.microservice.warehouse_service.entity.Receipt;
-import qbit.microservice.warehouse_service.entity.Item;
-import qbit.microservice.warehouse_service.repository.ReceiptRepository;
 import qbit.microservice.warehouse_service.dto.ProductVersionDto;
+import qbit.microservice.warehouse_service.dto.ThongKeDto;
+import qbit.microservice.warehouse_service.entity.Item;
+import qbit.microservice.warehouse_service.entity.Receipt;
+import qbit.microservice.warehouse_service.repository.ReceiptRepository;
 import qbit.microservice.warehouse_service.util.JwtUtil;
 
 import java.math.BigDecimal;
@@ -196,7 +195,7 @@ public class ReceiptService {
             for (Item item : receipt.getItems()) {
                 Long itemId = item.getId();
                 quarterlyStats.putIfAbsent(quarter, new HashMap<>());
-                quarterlyStats.get(quarter).putIfAbsent(itemId, new ThongKeDto(itemId,0, BigDecimal.ZERO));
+                quarterlyStats.get(quarter).putIfAbsent(itemId, new ThongKeDto(itemId, 0, BigDecimal.ZERO));
 
                 ThongKeDto stats = quarterlyStats.get(quarter).get(itemId);
                 stats.setSoLuong(stats.getSoLuong() + item.getQuantity());

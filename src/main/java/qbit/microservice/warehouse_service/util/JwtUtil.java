@@ -31,7 +31,6 @@ public class JwtUtil {
     }
 
 
-
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -46,7 +45,7 @@ public class JwtUtil {
     }
 
 
-    private Claims extractAllClaims(String token){
+    private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()

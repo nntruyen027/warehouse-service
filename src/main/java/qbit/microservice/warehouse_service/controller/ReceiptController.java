@@ -21,7 +21,7 @@ public class ReceiptController {
 
     @GetMapping("")
     public ResponseEntity<?> findAll(Pageable pageable) {
-        return  ResponseEntity.ok(receiptService.getAllReceipts(pageable));
+        return ResponseEntity.ok(receiptService.getAllReceipts(pageable));
     }
 
     @GetMapping("/{id}")
@@ -35,7 +35,7 @@ public class ReceiptController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOne(@PathVariable String id, @RequestBody Receipt receipt)  {
+    public ResponseEntity<?> updateOne(@PathVariable String id, @RequestBody Receipt receipt) {
         return ResponseEntity.ok(receiptService.updateReceipt(id, receipt));
     }
 
@@ -47,12 +47,12 @@ public class ReceiptController {
 
     @PostMapping("/{id}/report")
     public ResponseEntity<byte[]> generateReport(@PathVariable String id) throws Exception {
-            byte[] pdfBytes = receiptService.generateReceiptReport(receiptService.getReceiptById(id));
+        byte[] pdfBytes = receiptService.generateReceiptReport(receiptService.getReceiptById(id));
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=receipt.pdf")
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .body(pdfBytes);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=receipt.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
 
     }
 

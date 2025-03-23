@@ -21,5 +21,5 @@ public interface ProductServiceClient {
 
     @PutMapping(value = "/products/{productId}/versions/{id}/remove/{quantity}")
     ResponseEntity<ProductVersionDto> removeItem(@PathVariable Long productId, @PathVariable Long id, @PathVariable int quantity,
-                                              @RequestHeader("Authorization") String authorizationHeader);
+                                                 @RequestHeader("Authorization") String authorizationHeader);
 }
