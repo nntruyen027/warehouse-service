@@ -45,27 +45,28 @@ public class PhieuXuatController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/{id}/report")
     public ResponseEntity<byte[]> generateReport(@PathVariable String id) throws Exception {
         PhieuXuat phieuXuat = phieuXuatService.getPhieuXuatById(id);
         byte[] pdfBytes = phieuXuatService.generatePhieuXuatReport(phieuXuat);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=phieu_xuat.pdf")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=phieu_xuat.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfBytes);
     }
 
-    @GetMapping("/statistics")
+    @PostMapping("/statistics")
     public ResponseEntity<?> doStatistics(@RequestBody StatisticsInputDto input) throws Exception {
         return ResponseEntity.ok(phieuXuatService.getThongKe(input.getIds(), input.getStartDate(), input.getEndDate()));
     }
 
-    @GetMapping("/statistics/year/{nam}/quarters")
+    @PostMapping("/statistics/year/{nam}/quarters")
     public ResponseEntity<?> doQuarterlyStatistics(@PathVariable int nam) throws Exception {
         return ResponseEntity.ok(phieuXuatService.getQuarterlyImportStatistics(nam));
     }
 
-    @GetMapping("/statistics/year/{nam}/months")
+    @PostMapping("/statistics/year/{nam}/months")
     public ResponseEntity<?> doMonthlyStatistics(@PathVariable int nam) throws Exception {
         return ResponseEntity.ok(phieuXuatService.getMonthlyImportStatistics(nam));
     }

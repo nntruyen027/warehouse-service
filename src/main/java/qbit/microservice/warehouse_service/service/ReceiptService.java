@@ -59,10 +59,9 @@ public class ReceiptService {
             );
 
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Không thể cập nhật kho cho sản phẩm: " + item.getVersionName());
+                throw new RuntimeException("Không thể cập nhật kho cho sản phẩm: " + item.getName());
             }
         }
-        // Tính tổng số tiền của phiếu nhập kho
         BigDecimal totalAmount = receipt.getItems().stream()
                 .map(Item::getItemTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

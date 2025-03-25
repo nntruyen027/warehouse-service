@@ -11,9 +11,10 @@ import java.math.BigDecimal;
 @Builder
 public class Item {
     private Long id;
-    private String versionName;
+    private String name;
     private BigDecimal price;
     private Integer quantity;
     private String donViTinh;
     private BigDecimal itemTotal;
+    private Long type;
 }

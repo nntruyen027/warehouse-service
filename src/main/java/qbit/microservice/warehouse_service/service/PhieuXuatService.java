@@ -59,7 +59,7 @@ public class PhieuXuatService {
                     "Bearer " + jwtUtil.getJwtFromContext()
             );
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Không thể cập nhật kho cho sản phẩm: " + item.getVersionName());
+                throw new RuntimeException("Không thể cập nhật kho cho sản phẩm: " + item.getName());
             }
         }
         // Tính tổng số tiền của phiếu xuất
@@ -107,7 +107,7 @@ public class PhieuXuatService {
                         newItem.getId(), newItem.getId(), quantityDifference, "Bearer " + jwtUtil.getJwtFromContext()
                 );
                 if (!response.getStatusCode().is2xxSuccessful()) {
-                    throw new RuntimeException("Không thể cập nhật kho cho sản phẩm: " + newItem.getVersionName());
+                    throw new RuntimeException("Không thể cập nhật kho cho sản phẩm: " + newItem.getName());
                 }
             } else if (quantityDifference < 0) {
                 // Hủy xuất bớt: trả lại số lượng cho kho
@@ -115,7 +115,7 @@ public class PhieuXuatService {
                         newItem.getId(), newItem.getId(), -quantityDifference, "Bearer " + jwtUtil.getJwtFromContext()
                 );
                 if (!response.getStatusCode().is2xxSuccessful()) {
-                    throw new RuntimeException("Không thể cập nhật kho cho sản phẩm: " + newItem.getVersionName());
+                    throw new RuntimeException("Không thể cập nhật kho cho sản phẩm: " + newItem.getName());
                 }
             }
         }
